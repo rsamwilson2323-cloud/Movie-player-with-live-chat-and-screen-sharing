@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WatchParty 🎬</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Exo+2:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090f;--s:#0d1120;--b:#1a2540;--a:#7c3aed;--a2:#a855f7;--gold:#f59e0b;--t:#e2e8f0;--m:#4a5568;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:var(--bg);font-family:'Exo 2',sans-serif;color:var(--t);display:flex;align-items:center;justify-content:center;padding:16px;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(124,58,237,.15),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(168,85,247,.1),transparent 50%);pointer-events:none;}
+.card{width:min(460px,100%);background:var(--s);border:1px solid var(--b);border-radius:20px;padding:32px;animation:up .4s ease;}
+@keyframes up{from{opacity:0;transform:translateY(16px)}}
+.logo{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;background:linear-gradient(135deg,var(--a),var(--a2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px;}
+.tag{text-align:center;font-size:12px;color:var(--m);letter-spacing:1px;margin-bottom:24px;}
+.box{background:#060810;border:1px solid var(--b);border-radius:10px;padding:12px 14px;margin-bottom:18px;}
+.lbl{font-size:10px;color:var(--m);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.row:last-child{margin-bottom:0}
+.ico{font-size:13px;width:18px;text-align:center;}
+.val{font-family:monospace;font-size:12px;color:var(--a2);flex:1;word-break:break-all;}
+.cp{background:transparent;border:1px solid var(--a);color:var(--a);border-radius:5px;padding:3px 9px;font-size:11px;cursor:pointer;transition:all .15s;font-family:'Exo 2',sans-serif;white-space:nowrap;}
+.cp:hover{background:var(--a);color:#fff;}
+.cp.ok{background:var(--gold);border-color:var(--gold);color:#000;}
+label{display:block;font-size:11px;color:var(--m);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+input{width:100%;background:#060810;border:1px solid var(--b);border-radius:8px;padding:10px 13px;color:var(--t);font-size:14px;font-family:'Exo 2',sans-serif;outline:none;transition:border-color .2s;margin-bottom:14px;}
+input:focus{border-color:var(--a);}
+.div{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--m);font-size:12px;}
+.div::before,.div::after{content:'';flex:1;height:1px;background:var(--b);}
+.rrow{display:flex;gap:8px;margin-bottom:14px;}
+.code-in{flex:1;background:#060810;border:1px solid var(--b);border-radius:8px;padding:10px 13px;color:var(--t);font-size:16px;font-family:monospace;outline:none;letter-spacing:4px;text-transform:uppercase;transition:border-color .2s;}
+.code-in:focus{border-color:var(--a);}
+.code-in::placeholder{letter-spacing:1px;font-size:12px;font-family:'Exo 2',sans-serif;}
+.btn{padding:11px 18px;border:none;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .15s;}
+.btn-p{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;}
+.btn-p:hover{opacity:.9;}
+.btn-s{background:rgba(124,58,237,.2);border:1px solid var(--a);color:var(--a);}
+.btn-s:hover{background:var(--a);color:#fff;}
+.btn-full{width:100%;padding:12px;font-size:17px;margin-top:4px;}
+.gen{background:rgba(124,58,237,.15);border:1px solid var(--a);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:24px;letter-spacing:8px;color:var(--a2);text-align:center;display:none;font-weight:700;margin-bottom:10px;}
+.err{color:#f87171;font-size:12px;text-align:center;margin-top:8px;display:none;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🎬 WatchParty</div>
+  <div class="tag">Watch together · Chat together · From anywhere</div>
+
+  <div class="box">
+    <div class="lbl">Connect URL</div>
+    <div class="row"><span class="ico">📡</span><span class="val" id="lanUrl">Loading...</span><button class="cp" onclick="cp('lanUrl',this)">Copy</button></div>
+    <div class="row" id="pubRow" style="display:none"><span class="ico">🌍</span><span class="val" id="pubUrl">—</span><button class="cp" onclick="cp('pubUrl',this)">Copy</button></div>
+  </div>
+
+  <label>Your Name</label>
+  <input id="nameIn" placeholder="Enter your name..." maxlength="20" autocomplete="off">
+
+  <label>Join Existing Room</label>
+  <div class="rrow">
+    <input class="code-in" id="codeIn" placeholder="Room code (6 letters)" maxlength="6" oninput="this.value=this.value.toUpperCase()">
+    <button class="btn btn-p" onclick="joinRoom()">JOIN</button>
+  </div>
+
+  <div class="div">or create a new room</div>
+
+  <label>New Room</label>
+  <div class="gen" id="genCode"></div>
+  <div class="rrow">
+    <button class="btn btn-s" onclick="createRoom()">⚡ Generate Code</button>
+    <button class="btn btn-p" id="enterBtn" onclick="enterRoom()" disabled>ENTER →</button>
+  </div>
+
+  <div class="err" id="err"></div>
+</div>
+<script>
+let genCode = null;
+async function load() {
+  try {
+    const d = await fetch('/api/info').then(r=>r.json());
+    document.getElementById('lanUrl').textContent = d.lan;
+    if (d.public) { document.getElementById('pubUrl').textContent = d.public; document.getElementById('pubRow').style.display='flex'; }
+  } catch(e) { document.getElementById('lanUrl').textContent = location.origin; }
+}
+function cp(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    btn.textContent='✓'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok');},2000);
+  });
+}
+async function createRoom() {
+  const d = await fetch('/api/create-room',{method:'POST'}).then(r=>r.json());
+  genCode = d.code;
+  const el = document.getElementById('genCode');
+  el.textContent = d.code; el.style.display='block';
+  document.getElementById('enterBtn').disabled = false;
+}
+function enterRoom() {
+  if (!genCode) return;
+  const name = document.getElementById('nameIn').value.trim();
+  if (!name) { err('Enter your name'); return; }
+  sessionStorage.setItem('wp_name', name);
+  sessionStorage.setItem('wp_code', genCode);
+  location.href = '/watch.html';
+}
+function joinRoom() {
+  const name = document.getElementById('nameIn').value.trim();
+  const code = document.getElementById('codeIn').value.trim().toUpperCase();
+  if (!name) { err('Enter your name'); return; }
+  if (code.length !== 6) { err('Room code must be 6 characters'); return; }
+  sessionStorage.setItem('wp_name', name);
+  sessionStorage.setItem('wp_code', code);
+  location.href = '/watch.html';
+}
+function err(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg; el.style.display='block';
+  setTimeout(()=>el.style.display='none', 3000);
+}
+document.getElementById('codeIn').addEventListener('keydown', e=>{ if(e.key==='Enter') joinRoom(); });
+load();
+</script>
+</body>
+</html>
